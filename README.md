@@ -14,3 +14,18 @@ This is an ASP.NET Core Web API project that demonstrates key backend developmen
 - **IDE:** Visual Studio 
 - **Language:** C#
 
+---
+
+## Project Structure 🏗️
+
+### 1. Initial Commit: Domain Model
+- Created base Web API project using Visual Studio.
+- Added `User` and `Credential` domain model classes.
+
+### 2. Database Connection & Migration
+- Added SQL Server connection string in `appsettings.json`.
+- Registered `CredVaultDbContext` in `Program.cs` using Dependency Injection.
+- Ran `Add-Migration` and `Update-Database` to create database schema.
+
+
+

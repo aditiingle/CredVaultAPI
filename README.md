@@ -27,5 +27,11 @@ This is an ASP.NET Core Web API project that demonstrates key backend developmen
 - Registered `CredVaultDbContext` in `Program.cs` using Dependency Injection.
 - Ran `Add-Migration` and `Update-Database` to create database schema.
 
+### 3. DTO & Controller Implementation
+- Created `UserDto`.
+- Implemented HTTP methods (GET, POST, PUT, DELETE) in `UserController`.
+- Mapped Domain Model ↔ DTO manually inside controller.
+
+
 
 

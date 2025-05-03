@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using CredVault.API.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +10,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<CredVaultDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("CredVaultConnectionString"))); // Registers EF Core DbContext as a service, so it can be injected where needed (like in controllers).
 
 var app = builder.Build();
 

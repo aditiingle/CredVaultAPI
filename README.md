@@ -6,7 +6,7 @@ This is an ASP.NET Core Web API project that demonstrates key backend developmen
 
 ---
 
-## Tech Stack
+## Tech Stack ✨
 
 - **Framework:** ASP.NET Core Web API (.NET 8.0)
 - **Database:** SQL Server

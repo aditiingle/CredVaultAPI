@@ -1,6 +1,8 @@
 # CredVaultAPI
 
-An ASP.NET Core Web API project that demonstrates key backend development concepts such as **Dependency Injection**, **DTO–Domain Model Mapping**, **Entity Framework Core Migrations**, **Asynchronous Programming**, and the **Repository Pattern** — with SQL Server as the database.
+CredVault is a credential management API that allows users to store, retrieve, and manage their login credentials for websites they access using a RESTful service.
+
+This is an ASP.NET Core Web API project that demonstrates key backend development concepts such as **Dependency Injection**, **DTO–Domain Model Mapping**, **Entity Framework Core Migrations**, **Asynchronous Programming**, and the **Repository Pattern** — with SQL Server as the database.
 
 ---
 

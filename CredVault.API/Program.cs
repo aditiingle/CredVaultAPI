@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CredVault.API.Data;
+using CredVault.API.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<CredVaultDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("CredVaultConnectionString"))); // Registers EF Core DbContext as a service, so it can be injected where needed (like in controllers).
+
+// Inject the IUserRepository with the UserRepository implementation
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

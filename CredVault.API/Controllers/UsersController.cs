@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CredVault.API.Models.DTO;
 using CredVault.API.Models.Domain;
+using CredVault.API.Repositories;
 using Azure.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CredVault.API.Controllers
 {
@@ -12,18 +14,20 @@ namespace CredVault.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly CredVaultDbContext dbContext;
+        private readonly IUserRepository userRepository;
 
-        public UsersController(CredVaultDbContext dbContext)
+        public UsersController(CredVaultDbContext dbContext, IUserRepository userRepository)
         {
             this.dbContext = dbContext;
+            this.userRepository = userRepository;
         }
 
         // GET all users
         [HttpGet]
-        public IActionResult GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            // Get data from the database
-            var usersDomain = dbContext.Users.ToList();
+            // Call the Repository interface to retrieve data from the SQL Server using the method defined in the concrete repository class
+            var usersDomain = await userRepository.GetAllAsync();
 
             // Then, map the domain model to DTO
             var usersDto = new List<UserDto>();
@@ -44,12 +48,10 @@ namespace CredVault.API.Controllers
         // GET specific user by id
         [HttpGet]
         [Route("{id:Guid}")] // Ensure the id parameter in the URL is a Guid
-        public IActionResult GetUserById([FromRoute] Guid id)
+        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
         {
             // Get user domain model from the database
-            var userDomain = dbContext.Users
-                          .Where(x => x.Id == id)
-                          .FirstOrDefault();
+            var userDomain = await userRepository.GetUserByIdAsync(id);
 
             // Check if database returns a null value
             if (userDomain == null) 
@@ -71,7 +73,7 @@ namespace CredVault.API.Controllers
 
         // POST - a user can request to post their information
         [HttpPost]
-        public IActionResult CreateUser([FromBody] AddUserRequestDto addUserRequestDto) // Create Dto class to hold this request body
+        public async Task<IActionResult> CreateUser([FromBody] AddUserRequestDto addUserRequestDto) // Create Dto class to hold this request body
         {
             // Map the DTO (from user request) to a domain model
             var userDomain = new User
@@ -80,9 +82,9 @@ namespace CredVault.API.Controllers
                 Email = addUserRequestDto.Email
             };
 
-            // Use the domain model to create a user using DBContext
-            dbContext.Users.Add(userDomain);
-            dbContext.SaveChanges();
+            // Use the domain model to create a user using DBContext and the repository
+            userDomain = await userRepository.CreateUserAsync(userDomain);
+            
 
             // Map the newly added user domain model with the to the Dto to send to the client
             var userDto = new UserDto
@@ -99,22 +101,22 @@ namespace CredVault.API.Controllers
         // PUT - allows a user to update their details
         [HttpPut]
         [Route("{id:Guid}")]
-        public IActionResult UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserRequestDto updateUserRequestDto)
+        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserRequestDto updateUserRequestDto)
         {
-            // Ensure user exists
-            var userDomain = dbContext.Users.FirstOrDefault(x => x.Id == id);
+            // Map the Dto to a domain model
+            var userDomain = new User
+            {
+                Username = updateUserRequestDto.Username,
+                Email = updateUserRequestDto.Email
+            };
+
+            // Update user through the repository
+            userDomain = await userRepository.UpdateUserAsync(id, userDomain);
 
             if (userDomain == null)
             {
                 return NotFound();
             }
-
-            // Map the Dto (request from client) to the domain model - store data from Dto in updateUserRequestDto instance
-            userDomain.Username = updateUserRequestDto.Username;
-            userDomain.Email = updateUserRequestDto.Email;
-
-            // Save the update in the database from the domain model using DbContext
-            dbContext.SaveChanges();
 
             // Map domain model to Dto to send back Ok response with body containing updated domain model
             var userDto = new UserDto
@@ -132,19 +134,15 @@ namespace CredVault.API.Controllers
         // DELETE - method to delete a user from the database
         [HttpDelete]
         [Route("{id:Guid}")]
-        public IActionResult DeleteUser([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
-            // Ensure the user exists in DB
-            var userDomain = dbContext.Users.FirstOrDefault(x => x.Id == id);
+ 
+            var userDomain = await userRepository.DeleteUserAsync(id);
 
             if (userDomain == null)
             {
                 return NotFound();
             }
-
-            // Delete the user from database
-            dbContext.Users.Remove(userDomain);
-            dbContext.SaveChanges();
 
             // Map deleted domain model back to Dto to return in response body
             var userDto = new UserDto

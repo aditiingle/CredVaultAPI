@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CredVault.API.Data;
 using CredVault.API.Repositories;
+using CredVault.API.Mappings;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,9 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("CredVaultConnect
 
 // Inject the IUserRepository with the UserRepository implementation
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Inject Automapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 

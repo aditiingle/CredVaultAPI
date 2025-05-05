@@ -6,6 +6,7 @@ using CredVault.API.Models.Domain;
 using CredVault.API.Repositories;
 using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace CredVault.API.Controllers
 {
@@ -15,11 +16,13 @@ namespace CredVault.API.Controllers
     {
         private readonly CredVaultDbContext dbContext;
         private readonly IUserRepository userRepository;
+        private readonly IMapper mapper;
 
-        public UsersController(CredVaultDbContext dbContext, IUserRepository userRepository)
+        public UsersController(CredVaultDbContext dbContext, IUserRepository userRepository, IMapper mapper)
         {
             this.dbContext = dbContext;
             this.userRepository = userRepository;
+            this.mapper = mapper;
         }
 
         // GET all users
@@ -30,16 +33,7 @@ namespace CredVault.API.Controllers
             var usersDomain = await userRepository.GetAllAsync();
 
             // Then, map the domain model to DTO
-            var usersDto = new List<UserDto>();
-            foreach (var user in usersDomain)
-            {
-                usersDto.Add(new UserDto()
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email
-                });
-            }
+            var usersDto = mapper.Map<List<UserDto>>(usersDomain);
 
             // Return teh DTO to the client
             return Ok(usersDto);
@@ -59,16 +53,8 @@ namespace CredVault.API.Controllers
                 return NotFound();
             }
 
-            // If not null, map user domain model to DTO
-            var userDto = new UserDto()
-            {
-                Id = userDomain.Id,
-                Username = userDomain.Username,
-                Email = userDomain.Email
-            };
-
-            // Return DTO to client (Never return the domain model back to client)
-            return Ok(userDto);
+            // If not null, map user domain model to DTO. Return DTO to client (Never return the domain model back to client)
+            return Ok(mapper.Map<UserDto>(userDomain));
         }
 
         // POST - a user can request to post their information
@@ -76,23 +62,14 @@ namespace CredVault.API.Controllers
         public async Task<IActionResult> CreateUser([FromBody] AddUserRequestDto addUserRequestDto) // Create Dto class to hold this request body
         {
             // Map the DTO (from user request) to a domain model
-            var userDomain = new User
-            {
-                Username = addUserRequestDto.Username,
-                Email = addUserRequestDto.Email
-            };
+            var userDomain = mapper.Map<User>(addUserRequestDto);
 
             // Use the domain model to create a user using DBContext and the repository
             userDomain = await userRepository.CreateUserAsync(userDomain);
-            
+
 
             // Map the newly added user domain model with the to the Dto to send to the client
-            var userDto = new UserDto
-            {
-                Id = userDomain.Id,
-                Username = userDomain.Username,
-                Email = userDomain.Email
-            };
+            var userDto = mapper.Map<UserDto>(userDomain);
 
             // POST methods return a 201 response which is returned by the CreatedAtAction() method
             return CreatedAtAction(nameof(GetUserById), new { id = userDto.Id }, userDto);
@@ -104,11 +81,7 @@ namespace CredVault.API.Controllers
         public async Task<IActionResult> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserRequestDto updateUserRequestDto)
         {
             // Map the Dto to a domain model
-            var userDomain = new User
-            {
-                Username = updateUserRequestDto.Username,
-                Email = updateUserRequestDto.Email
-            };
+            var userDomain = mapper.Map<User>(updateUserRequestDto);
 
             // Update user through the repository
             userDomain = await userRepository.UpdateUserAsync(id, userDomain);
@@ -119,14 +92,7 @@ namespace CredVault.API.Controllers
             }
 
             // Map domain model to Dto to send back Ok response with body containing updated domain model
-            var userDto = new UserDto
-            {
-                Id = userDomain.Id,
-                Username = userDomain.Username,
-                Email = userDomain.Email
-            };
-            
-            return Ok(userDto);
+            return Ok(mapper.Map<UserDto>(userDomain));
 
 
         }
@@ -145,14 +111,7 @@ namespace CredVault.API.Controllers
             }
 
             // Map deleted domain model back to Dto to return in response body
-            var userDto = new UserDto
-            {
-                Id = userDomain.Id,
-                Username = userDomain.Username,
-                Email = userDomain.Email
-            };
-
-            return Ok(userDto);
+            return Ok(mapper.Map<UserDto>(userDomain));
            
         }
     }

@@ -1,7 +1,5 @@
 # CredVaultAPI
 
-CredVault is a credential management API that allows users to store, retrieve, and manage their login credentials for websites they access using a RESTful service.
-
 This is an ASP.NET Core Web API project that demonstrates key backend development concepts such as **Dependency Injection**, **DTO–Domain Model Mapping**, **Entity Framework Core Migrations**, **Asynchronous Programming**, and the **Repository Pattern** — with SQL Server as the database.
 
 ---
@@ -32,13 +30,19 @@ This is an ASP.NET Core Web API project that demonstrates key backend developmen
 - Implemented HTTP methods (GET, POST, PUT, DELETE) in `UserController`.
 - Mapped Domain Model ↔ DTO manually inside controller.
 
-### 4. Asynchronous Programming and Repository Pattern
+### 4. Implementing Asynchronous Programming and Repository Pattern
 - Converted all controller actions to `async Task<IActionResult>`.
 - Used `await` with EF Core operations to support non-blocking I/O, improving performance, reponsiveness, and scalability.
 - Introduced `IUserRepository` interface and `UserRepository` implementation to abstract data access logic.
 - All database interactions were moved from the controller to the repository.
 - The controller now uses constructor injection to depend on `IUserRepository`.
 - This pattern enforces separation of concerns: the controller is responsible for handling HTTP requests, while the repository handles data operations using `CredVaultDbContext`.
+
+### 5. AutoMapper Integration
+- Created mapping profiles to map between User, UserDto, AddUserRequestDto, and UpdateUserRequestDto with ReverseMapping.
+- Configured AutoMapper in Program.cs and registered it via Dependency Injection.
+
+
 
 
 

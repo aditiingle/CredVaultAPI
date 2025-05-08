@@ -18,6 +18,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("CredVaultConnect
 
 // Inject the IUserRepository with the UserRepository implementation
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICredentialRepository, CredentialRepository>();
 
 // Inject Automapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

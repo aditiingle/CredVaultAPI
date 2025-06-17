@@ -42,7 +42,7 @@ This is an ASP.NET Core Web API project that demonstrates key backend developmen
 - Created mapping profiles to map between User, UserDto, AddUserRequestDto, and UpdateUserRequestDto with ReverseMapping.
 - Configured AutoMapper in Program.cs and registered it via Dependency Injection.
 
-### 5. CRUD operations for Credentials 
+### 6. CRUD operations for Credentials 
 - Added the necessary CRUD operations for managing user credentials.
 
 
